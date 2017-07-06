@@ -65,18 +65,23 @@ error_log(print_r($startup_vars,true));
 
     		// Work with originField to get its format etc, and content
     		var originField = csvOptions[0].replace(/[\[|\]]/g, '');
-    		var originFieldDictionary = <?php REDCap::getDataDictionary('array', false, $originField)?>;
-    		var originFieldValidationType = originFieldDictionary[7];
+    		// NEXT TWO LINES IS DEFINITELY NOT POSSIBLE.
+    		// Must find another way to get field validation
+    		//var originFieldDictionary = <?php REDCap::getDataDictionary('array', false, originField)?>;
+    		//var originFieldValidationType = originFieldDictionary[7];
+
+    		// THIS MIGHT BE A BETTER WAY...
     		var originTr = $('tr[sq_id=' + originField + ']');
     		var originInput = $('input', originTr);
+    		var originFieldValidationType = $(originInput).attr('fv')
 
-    		if (originFieldValidationType == "date_ymd") {
+    		if (originFieldValidationType == 'date_ymd') {
     			//what to do here
     		};
-    		else if (originFieldValidationType == "date_dmy") {
+    		else if (originFieldValidationType == 'date_dmy') {
     			//what to do...
     		};
-    		else if (originFieldValidationType == "date_mdy") {
+    		else if (originFieldValidationType == 'date_mdy') {
     			//what to dooo....
     		};
 
