@@ -52,10 +52,11 @@ error_log(print_r($startup_vars, true));
 <script type='text/javascript'>
     $(document).ready(function() {
     	var datecalcFields = <?php print json_encode($startup_vars) ?>;
-
-    	// Loop through each field contained in datecalc_fields
+      console.log('datecalcFields = ' + datecalcFields);
+    	
+      // Loop through each field contained in datecalc_fields
     	$(datecalcFields).each(function(field, params) {
-    		var fieldTr = $('tr[sq_id=' + field + ']');
+    		var fieldTr = $('tr[sq_id="' + field + '"]');
     		var fieldInput = $('input', fieldTr); // probably useless
     		var csvOptions = params.params.split(",");
     		// csvOptions should now be array with 
@@ -63,53 +64,64 @@ error_log(print_r($startup_vars, true));
     		// [1] => offset
     		// [2] => unit
 
+        console.log('fieldTr = ' + fieldTr);
+        console.log('fieldInput = ' + fieldInput);
+        console.log('csvOptions[0] = ' + csvOptions[0]);
+        console.log('csvOptions[1] = ' + csvOptions[1]);
+        console.log('csvOptions[2] = ' + csvOptions[2]);
+
+        // Try a simple thing: copy the content of origin to target
+        //var fieldInput = $('input:text[name="test_origin_date"]')
+        //console.log('fieldInput = ' + fieldInput);
+
+
+
+
     		// Work with originField to get its format etc, and content
     		var originField = csvOptions[0].replace(/[\[|\]]/g, '');
-    		// NEXT TWO LINES ARE DEFINITELY NOT POSSIBLE.
-    		// Must find another way to get field validation
-    		//var originFieldDictionary = <?php REDCap::getDataDictionary('array', false, originField)?>;
-    		//var originFieldValidationType = originFieldDictionary[7];
+        console.log('originField = ' + originField);
 
-    		// THIS MIGHT BE A BETTER WAY...
-    		var originTr = $('tr[sq_id=' + originField + ']');
+    		// Get content of origin date field
+    		var originTr = $('tr[sq_id="' + originField + '"]');
     		var originInput = $('input', originTr);
     		var originFieldValidationType = $(originInput).attr('fv')
+        console.log('originTr = ' + originTr);
+        console.log('originInput = ' + originInput);
+        console.log('originFieldValidationType = ' + originFieldValidationType);
 
         // Initialize output date
         var targetDate = new Date(fieldInput);
-
-        // Some debug logs
-        console.log('fieldTr = ' + fieldTr + ' / fieldInput = ' + fieldInput + 
-          ' / csvOptions = {' + csvOptions[0] + ',' + csvOptions[1] + ',' + csvOptions[2] + '}' + 
-          ' / originField = ' originField + ' / originTr = ' + originTr + ' / originInput = ' + 
-          originInput + ' / originFieldValidationType = ' + originFieldValidationType + ' / targetDate = ' + 
-          targetDate);
+        console.log('targetDate = ' + targetDate);
 
     		if (originFieldValidationType == 'date_ymd') {
     			// Add days
           if (unit == 'd') {
             targetDate = targetDate.setDate(targetDate.getDate() + csvOptions[1]);
-          };
+          }
           else if (unit == 'm') {
             targetDate = targetDate.setMonth(targetDate.getMonth() + csvOptions[1]);
-          };
+          }
           else if (unit == 'y') {
             targetDate = targetDate.setYear(targetDate.getYear() + csvOptions[1]);
-          }
+          };
     		};
 
         // Will be amended at a later stage when I get time, but should be straightforward if I can get the first one running
     		//else if (originFieldValidationType == 'date_dmy') {
     			//what to do...
-    		};
+    		//};
     		//else if (originFieldValidationType == 'date_mdy') {
     			//what to dooo....
-    		};
+    		//};
 
         // New logs
         console.log(targetDate);
 
         // Need to actually write down the content to the field. How... ?
+        // should use something like this code
+          // if ($(usernameInput).val() === '') {
+            //$(usernameInput).val('<?php print USERID; ?>'); // USERID is "[survey respondent]" on surveys
+          //}
 
     	});
     });
