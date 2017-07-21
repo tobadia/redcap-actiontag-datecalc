@@ -11,7 +11,7 @@
  *
  * Offseting by hours, minutes or seconds will assume that a Date field has 
  * a time value 00:00:00, and therefore should only be used with a Datetime field as source
-    @DATECALC={[date], 7, "d"}
+    @DATECALC={[date], 7, d}
     
     Thomas Obadia
     Pasteur Institute, Paris, France
@@ -46,7 +46,7 @@ if (!isset($hook_functions[$term])) {
 // List al the fields to inject and log some things for debug purposes
 $startup_vars = $hook_functions[$term];
 error_log("Startup Vars in " . __FILE__);
-error_log(print_r($startup_vars,true));
+error_log(print_r($startup_vars, true));
 ?>
 
 <script type='text/javascript'>
@@ -56,7 +56,7 @@ error_log(print_r($startup_vars,true));
     	// Loop through each field contained in datecalc_fields
     	$(datecalcFields).each(function(field, params) {
     		var fieldTr = $('tr[sq_id=' + field + ']');
-    		var fieldInput = $('input', fieldTr);
+    		var fieldInput = $('input', fieldTr); // probably useless
     		var csvOptions = params.params.split(",");
     		// csvOptions should now be array with 
     		// [0] => time of origin
@@ -65,7 +65,7 @@ error_log(print_r($startup_vars,true));
 
     		// Work with originField to get its format etc, and content
     		var originField = csvOptions[0].replace(/[\[|\]]/g, '');
-    		// NEXT TWO LINES IS DEFINITELY NOT POSSIBLE.
+    		// NEXT TWO LINES ARE DEFINITELY NOT POSSIBLE.
     		// Must find another way to get field validation
     		//var originFieldDictionary = <?php REDCap::getDataDictionary('array', false, originField)?>;
     		//var originFieldValidationType = originFieldDictionary[7];
@@ -75,15 +75,41 @@ error_log(print_r($startup_vars,true));
     		var originInput = $('input', originTr);
     		var originFieldValidationType = $(originInput).attr('fv')
 
+        // Initialize output date
+        var targetDate = new Date(fieldInput);
+
+        // Some debug logs
+        console.log('fieldTr = ' + fieldTr + ' / fieldInput = ' + fieldInput + 
+          ' / csvOptions = {' + csvOptions[0] + ',' + csvOptions[1] + ',' + csvOptions[2] + '}' + 
+          ' / originField = ' originField + ' / originTr = ' + originTr + ' / originInput = ' + 
+          originInput + ' / originFieldValidationType = ' + originFieldValidationType + ' / targetDate = ' + 
+          targetDate);
+
     		if (originFieldValidationType == 'date_ymd') {
-    			//what to do here
+    			// Add days
+          if (unit == 'd') {
+            targetDate = targetDate.setDate(targetDate.getDate() + csvOptions[1]);
+          };
+          else if (unit == 'm') {
+            targetDate = targetDate.setMonth(targetDate.getMonth() + csvOptions[1]);
+          };
+          else if (unit == 'y') {
+            targetDate = targetDate.setYear(targetDate.getYear() + csvOptions[1]);
+          }
     		};
-    		else if (originFieldValidationType == 'date_dmy') {
+
+        // Will be amended at a later stage when I get time, but should be straightforward if I can get the first one running
+    		//else if (originFieldValidationType == 'date_dmy') {
     			//what to do...
     		};
-    		else if (originFieldValidationType == 'date_mdy') {
+    		//else if (originFieldValidationType == 'date_mdy') {
     			//what to dooo....
     		};
+
+        // New logs
+        console.log(targetDate);
+
+        // Need to actually write down the content to the field. How... ?
 
     	});
     });
