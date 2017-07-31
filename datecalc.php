@@ -5,13 +5,13 @@
  *    - days
  *    - months
  *    - years
- *    - hours
- *    - minutes
- *    - seconds
+ *    - hours (not supported currently)
+ *    - minutes (not supported currently)
+ *    - seconds (not supported currently)
  *
  * Offseting by hours, minutes or seconds will assume that a Date field has 
  * a time value 00:00:00, and therefore should only be used with a Datetime field as source
-    @DATECALC={[date], 7, d}
+    @DATECALC=[date], 7, d
     
     Thomas Obadia
     Pasteur Institute, Paris, France
@@ -50,79 +50,107 @@ error_log(print_r($startup_vars, true));
 ?>
 
 <script type='text/javascript'>
+
+    // Function to convert dates to proper format
+    function formatDate(date, format) {
+      
+      // Initialize Date object and extract YYYY, (M)M, (D)D
+      var d = new Date(date), 
+      year = d.getFullYear(), 
+      month = ''+ (d.getMonth() + 1), 
+      day = '' + d.getDate();
+
+      // Pad with leading zeros if needed
+      if (day.length < 2) day = '0' + day;
+      if (month.length < 2) month = '0' + month;
+
+      // Return date formated as requested
+      if (format == 'ymd') {return [year, month, day].join('-');}
+      else if (format == 'dmy') {return [day, month, year].join('-');}
+      else if (format == 'mdy') {return [month, day, year].join('-');};
+    };
+
+
+
+    // Actually run the hook over all document
     $(document).ready(function() {
     	var datecalcFields = <?php print json_encode($startup_vars) ?>;
-      console.log('datecalcFields = ' + datecalcFields);
+      console.log('datecalcFields = ', datecalcFields);
     	
       // Loop through each field contained in datecalc_fields
-    	$(datecalcFields).each(function(field, params) {
-    		var fieldTr = $('tr[sq_id="' + field + '"]');
-    		var fieldInput = $('input', fieldTr); // probably useless
-    		var csvOptions = params.params.split(",");
-    		// csvOptions should now be array with 
-    		// [0] => time of origin
-    		// [1] => offset
-    		// [2] => unit
+    	$.each(datecalcFields, function(targetFieldName, params) {
+    		console.log('targetFieldName = ', targetFieldName);
+        console.log('params = ', params);
 
-        console.log('fieldTr = ' + fieldTr);
-        console.log('fieldInput = ' + fieldInput);
-        console.log('csvOptions[0] = ' + csvOptions[0]);
-        console.log('csvOptions[1] = ' + csvOptions[1]);
-        console.log('csvOptions[2] = ' + csvOptions[2]);
+        // Get parent tr from table
+        var targetFieldTr = $('tr[sq_id="' + targetFieldName + '"]');
+    		console.log('targetFieldTr = ', targetFieldTr);
+        
+        // Extract current input, probbaly useless but let's keep track of code
+        var targetFieldInput = $('input', targetFieldTr);
+    		console.log('targetFieldInput = ', targetFieldInput);
+        
+        var csvOptions = params.params.split(",");
+    		console.log('csvOptions[0] = ', csvOptions[0]);
+        console.log('csvOptions[1] = ', csvOptions[1]);
+        console.log('csvOptions[2] = ', csvOptions[2]);
+        // csvOptions should now be array with strings
+    		// [0] => time of origin
+    		// [1] => offset (must be converted to Number)
+    		// [2] => unit
+        
 
         // Try a simple thing: copy the content of origin to target
-        //var fieldInput = $('input:text[name="test_origin_date"]')
-        //console.log('fieldInput = ' + fieldInput);
+        //var targetFieldInput = $('input:text[name="test_origin_date"]')
+        //console.log('targetFieldInput = ' + targetFieldInput);
 
 
 
 
     		// Work with originField to get its format etc, and content
-    		var originField = csvOptions[0].replace(/[\[|\]]/g, '');
-        console.log('originField = ' + originField);
+    		var originFieldName = csvOptions[0].replace(/[\[|\]]/g, '');
+        console.log('originField = ' + originFieldName);
 
     		// Get content of origin date field
-    		var originTr = $('tr[sq_id="' + originField + '"]');
-    		var originInput = $('input', originTr);
-    		var originFieldValidationType = $(originInput).attr('fv')
-        console.log('originTr = ' + originTr);
-        console.log('originInput = ' + originInput);
-        console.log('originFieldValidationType = ' + originFieldValidationType);
+    		var originFieldTr = $('tr[sq_id="' + originFieldName + '"]');
+    		console.log('originFieldTr = ', originFieldTr);
+        var originFieldInput = $('input', originFieldTr);
+    		console.log('originFieldInput = ', originFieldInput);
+        var originFieldValidationType = $(originFieldInput).attr('fv')
+        console.log('originFieldValidationType = ', originFieldValidationType);
+        
+        // Initialize output date at origin date
+        console.log('originFieldInput.val() = ', originFieldInput.val());
+        var targetDate = new Date(originFieldInput.val());
+        console.log('targetDate = ', targetDate);
 
-        // Initialize output date
-        var targetDate = new Date(fieldInput);
-        console.log('targetDate = ' + targetDate);
-
-    		if (originFieldValidationType == 'date_ymd') {
+    		// This will only handle dates and not datetimes, for now...
+        if (originFieldValidationType == 'date_ymd' | originFieldValidationType == 'date_dmy' | originFieldValidationType == 'date_mdy') {
     			// Add days
-          if (unit == 'd') {
-            targetDate = targetDate.setDate(targetDate.getDate() + csvOptions[1]);
+          if (csvOptions[2] == 'd') {
+            console.log('Origin day = ', targetDate.getDate());
+            console.log('Target day = ', targetDate.getDate() + Number(csvOptions[1]));
+            targetDate.setDate(targetDate.getDate() + Number(csvOptions[1]));
           }
-          else if (unit == 'm') {
-            targetDate = targetDate.setMonth(targetDate.getMonth() + csvOptions[1]);
+          else if (csvOptions[2] == 'm') {
+            console.log('Origin month = ', targetDate.getMonth());
+            console.log('Target month = ', targetDate.getMonth() + Number(csvOptions[1]));
+            targetDate.setMonth(targetDate.getMonth() + Number(csvOptions[1]));
           }
-          else if (unit == 'y') {
-            targetDate = targetDate.setYear(targetDate.getYear() + csvOptions[1]);
+          else if (csvOptions[2] == 'y') {
+            console.log('Origin year = ', targetDate.getYear());
+            console.log('Target year = ', targetDate.getYear() + Number(csvOptions[1]));
+            targetDate.setYear(targetDate.getYear() + Number(csvOptions[1]));
           };
     		};
+        console.log('targetDate + offset = ', targetDate);
 
-        // Will be amended at a later stage when I get time, but should be straightforward if I can get the first one running
-    		//else if (originFieldValidationType == 'date_dmy') {
-    			//what to do...
-    		//};
-    		//else if (originFieldValidationType == 'date_mdy') {
-    			//what to dooo....
-    		//};
-
-        // New logs
-        console.log(targetDate);
-
-        // Need to actually write down the content to the field. How... ?
-        // should use something like this code
-          // if ($(usernameInput).val() === '') {
-            //$(usernameInput).val('<?php print USERID; ?>'); // USERID is "[survey respondent]" on surveys
-          //}
-
-    	});
-    });
+        // Write the target date in the field only if it is empty (i.e. has not been calculated previously)
+          if ($(targetFieldInput).val() === '') {
+            if (originFieldValidationType == 'date_ymd') {$(targetFieldInput).val(formatDate(targetDate, 'ymd'))}
+            else if (originFieldValidationType == 'date_dmy') {$(targetFieldInput).val(formatDate(targetDate, 'dmy'))}
+            else if (originFieldValidationType == 'date_mdy') {$(targetFieldInput).val(formatDate(targetDate, 'mdy'))};
+          };
+        });
+});
 </script>
