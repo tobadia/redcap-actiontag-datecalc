@@ -75,25 +75,25 @@ error_log(print_r($startup_vars, true));
     // Actually run the hook over all document
     $(document).ready(function() {
     	var datecalcFields = <?php print json_encode($startup_vars) ?>;
-      console.log('datecalcFields = ', datecalcFields);
+      //console.log('datecalcFields = ', datecalcFields);
     	
       // Loop through each field contained in datecalc_fields
     	$.each(datecalcFields, function(targetFieldName, params) {
-    		console.log('targetFieldName = ', targetFieldName);
-        console.log('params = ', params);
+    		//console.log('targetFieldName = ', targetFieldName);
+        //console.log('params = ', params);
 
         // Get parent tr from table
         var targetFieldTr = $('tr[sq_id="' + targetFieldName + '"]');
-    		console.log('targetFieldTr = ', targetFieldTr);
+    		//console.log('targetFieldTr = ', targetFieldTr);
         
         // Extract current input, probbaly useless but let's keep track of code
         var targetFieldInput = $('input', targetFieldTr);
-    		console.log('targetFieldInput = ', targetFieldInput);
+    		//console.log('targetFieldInput = ', targetFieldInput);
         
         var csvOptions = params.params.split(",");
-    		console.log('csvOptions[0] = ', csvOptions[0]);
-        console.log('csvOptions[1] = ', csvOptions[1]);
-        console.log('csvOptions[2] = ', csvOptions[2]);
+    		//console.log('csvOptions[0] = ', csvOptions[0]);
+        //console.log('csvOptions[1] = ', csvOptions[1]);
+        //console.log('csvOptions[2] = ', csvOptions[2]);
         // csvOptions should now be array with strings
     		// [0] => time of origin
     		// [1] => offset (must be converted to Number)
@@ -109,41 +109,41 @@ error_log(print_r($startup_vars, true));
 
     		// Work with originField to get its format etc, and content
     		var originFieldName = csvOptions[0].replace(/[\[|\]]/g, '');
-        console.log('originField = ' + originFieldName);
+        //console.log('originField = ' + originFieldName);
 
     		// Get content of origin date field
     		var originFieldTr = $('tr[sq_id="' + originFieldName + '"]');
-    		console.log('originFieldTr = ', originFieldTr);
+    		//console.log('originFieldTr = ', originFieldTr);
         var originFieldInput = $('input', originFieldTr);
-    		console.log('originFieldInput = ', originFieldInput);
+    		//console.log('originFieldInput = ', originFieldInput);
         var originFieldValidationType = $(originFieldInput).attr('fv')
-        console.log('originFieldValidationType = ', originFieldValidationType);
+        //console.log('originFieldValidationType = ', originFieldValidationType);
         
         // Initialize output date at origin date
-        console.log('originFieldInput.val() = ', originFieldInput.val());
+        //console.log('originFieldInput.val() = ', originFieldInput.val());
         var targetDate = new Date(originFieldInput.val());
-        console.log('targetDate = ', targetDate);
+        //console.log('targetDate = ', targetDate);
 
     		// This will only handle dates and not datetimes, for now...
         if (originFieldValidationType == 'date_ymd' | originFieldValidationType == 'date_dmy' | originFieldValidationType == 'date_mdy') {
     			// Add days
           if (csvOptions[2] == 'd') {
-            console.log('Origin day = ', targetDate.getDate());
-            console.log('Target day = ', targetDate.getDate() + Number(csvOptions[1]));
+            //console.log('Origin day = ', targetDate.getDate());
+            //console.log('Target day = ', targetDate.getDate() + Number(csvOptions[1]));
             targetDate.setDate(targetDate.getDate() + Number(csvOptions[1]));
           }
           else if (csvOptions[2] == 'm') {
-            console.log('Origin month = ', targetDate.getMonth());
-            console.log('Target month = ', targetDate.getMonth() + Number(csvOptions[1]));
+            //console.log('Origin month = ', targetDate.getMonth());
+            //console.log('Target month = ', targetDate.getMonth() + Number(csvOptions[1]));
             targetDate.setMonth(targetDate.getMonth() + Number(csvOptions[1]));
           }
           else if (csvOptions[2] == 'y') {
-            console.log('Origin year = ', targetDate.getYear());
-            console.log('Target year = ', targetDate.getYear() + Number(csvOptions[1]));
+            //console.log('Origin year = ', targetDate.getYear());
+            //console.log('Target year = ', targetDate.getYear() + Number(csvOptions[1]));
             targetDate.setYear(targetDate.getYear() + Number(csvOptions[1]));
           };
     		};
-        console.log('targetDate + offset = ', targetDate);
+        //console.log('targetDate + offset = ', targetDate);
 
         // Write the target date in the field only if it is empty (i.e. has not been calculated previously)
           if ($(targetFieldInput).val() === '') {
