@@ -77,10 +77,10 @@ $record_id = REDCap::getRecordIdField();
       if (format == 'ymd') {return [year, month, day].join('-');}
       else if (format == 'dmy') {return [day, month, year].join('-');}
       else if (format == 'mdy') {return [month, day, year].join('-');}
-      else if (format == 'datetime_ymd') {return [year, month, year].join('-') + ' ' + [hours, minutes].join(':');}
+      else if (format == 'datetime_ymd') {return [year, month, day].join('-') + ' ' + [hours, minutes].join(':');}
       else if (format == 'datetime_dmy') {return [day, month, year].join('-') + ' ' + [hours, minutes].join(':');}
       else if (format == 'datetime_mdy') {return [month, day, year].join('-') + ' ' + [hours, minutes].join(':');}
-      else if (format == 'datetime_seconds_ymd') {return [year, month, year].join('-') + ' ' + [hours, minutes, seconds].join(':');}
+      else if (format == 'datetime_seconds_ymd') {return [year, month, day].join('-') + ' ' + [hours, minutes, seconds].join(':');}
       else if (format == 'datetime_seconds_dmy') {return [day, month, year].join('-') + ' ' + [hours, minutes, seconds].join(':');}
       else if (format == 'datetime_seconds_mdy') {return [month, day, year].join('-') + ' ' + [hours, minutes, seconds].join(':');};
     };
