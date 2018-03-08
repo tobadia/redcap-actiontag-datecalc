@@ -94,16 +94,16 @@ $record_id = REDCap::getRecordIdField();
     	
       // Loop through each field contained in datecalc_fields
     	$.each(datecalcFields, function(targetFieldName, params) {
-    		console.log('targetFieldName = ', targetFieldName);
-        console.log('params = ', params);
+    		//console.log('targetFieldName = ', targetFieldName);
+        //console.log('params = ', params);
 
         // Get parent tr from table
         var targetFieldTr = $('tr[sq_id="' + targetFieldName + '"]');
-    		console.log('targetFieldTr = ', targetFieldTr);
+    		//console.log('targetFieldTr = ', targetFieldTr);
         
         // Extract current input, probbaly useless but let's keep track of code
         var targetFieldInput = $('input', targetFieldTr);
-    		console.log('targetFieldInput = ', targetFieldInput);
+    		//console.log('targetFieldInput = ', targetFieldInput);
         
         var csvOptions = params.params.split(",");
     		//console.log('csvOptions[0] = ', csvOptions[0]);
