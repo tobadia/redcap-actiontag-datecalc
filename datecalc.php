@@ -132,9 +132,32 @@ $record_id = REDCap::getRecordIdField();
         //console.log('originFieldInput = ', originFieldInput);
         //console.log('originFieldValidationType = ', originFieldValidationType);
 
+        // JavaScript is dumb: it doesn't allow to specify date(time) formats
+        // Let' do this by hand since it's not practical to use libraries like moments.js, unfortunately...
+        // First, split into date/time (if any) and add a dummy time element
+        var originFieldInputParts = originFieldInput.val().split(' ');
+        if (originFieldInputParts.length == '1') originFieldInputParts.push('')
+        // Identify separator in the date part
+        var dateSeparator = originFieldInputParts[0].indexOf('/')
+        if (dateSeparator == '-1') dateSeparator = '-';
+        //console.log('originFieldInputParts = ', originFieldInputParts);
+        //console.log('dateSeparator = ', dateSeparator);
+        var dateParts = originFieldInputParts[0].split(dateSeparator);
+        // Reshape date(time) input into short format actually handled by JS
+        if (originFieldValidationType == 'date_ymd' | originFieldValidationType == 'datetime_ymd' | originFieldValidationType == 'datetime_seconds_ymd') {
+          var modifiedFieldInput = dateParts[1] + '-' + dateParts[2] + '-' + dateParts[0] + ' ' + originFieldInputParts[1]
+        }
+        else if (originFieldValidationType == 'date_dmy' | originFieldValidationType == 'datetime_dmy' | originFieldValidationType == 'datetime_seconds_dmy') {
+          var modifiedFieldInput = dateParts[1] + '-' + dateParts[0] + '-' + dateParts[2] + ' ' + originFieldInputParts[1]
+        }
+        else if (originFieldValidationType == 'date_mdy' | originFieldValidationType == 'datetime_mdy' | originFieldValidationType == 'datetime_seconds_mdy') {
+          var modifiedFieldInput = dateParts[0] + '-' + dateParts[1] + '-' + dateParts[2] + ' ' + originFieldInputParts[1]
+        }
+
+
         // Initialize output date at origin date and derive origin Epoch Time (from there)
         //console.log('originFieldInput.val() = ', originFieldInput.val());
-        var targetDate = new Date(originFieldInput.val());
+        var targetDate = new Date(modifiedFieldInput);
         var originTime = targetDate.getTime();
         //console.log('targetDate (origin value) = ', targetDate);
         //console.log('originTime (origin value) = ', originTime);
